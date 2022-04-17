@@ -45,7 +45,7 @@ public class BasicSimulation extends Simulation {
             )
             .exitHereIfFailed()
             .pause(2, 4)
-            .exec(http("browse3")
+            .exec(http("browse 3")
                     .get("/computers?p=3&n=10&s=name&d=asc")
             );
 
@@ -82,6 +82,17 @@ public class BasicSimulation extends Simulation {
                         rampConcurrentUsers(0).to(2).during(10),
                         constantConcurrentUsers(2).during(30)
                 )
-        ).protocols(httpProtocol);
+        ).protocols(httpProtocol)
+                .assertions(
+                        global().successfulRequests().percent().is(100.0),
+                        details("home").responseTime().percentile3().lte(2000),
+                        details("search").responseTime().percentile3().lte(300),
+                        details("browse 1").responseTime().percentile3().lte(300),
+                        details("browse 2").responseTime().percentile3().lte(300),
+                        details("browse 3").responseTime().percentile3().lte(300),
+                        details("search").responseTime().percentile3().lte(300),
+                        details("add").responseTime().percentile3().lte(300),
+                        details("post").responseTime().percentile3().lte(300)
+                );
     }
 }
