@@ -19,47 +19,69 @@ public class BasicSimulation extends Simulation {
             .upgradeInsecureRequestsHeader("1")
             .userAgentHeader("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0");
 
-
-    private final ScenarioBuilder scn = scenario("BasicSimulation")
+    private final ScenarioBuilder search = scenario("search")
             .exec(http("home")
                     .get("/computers")
             )
-            .pause(1)
+            .exitHereIfFailed()
+            .pause(3, 7)
             .exec(http("search")
                     .get("/computers?f=macbook+pro")
-            )
-            .pause(1)
+            );
+
+    private final ScenarioBuilder browse = scenario("browse")
             .exec(http("home")
                     .get("/computers")
             )
-            .pause(1)
+            .exitHereIfFailed()
+            .pause(3, 7)
             .exec(http("browse 1")
                     .get("/computers?p=1&n=10&s=name&d=asc")
             )
-            .pause(1)
+            .exitHereIfFailed()
+            .pause(2, 4)
             .exec(http("browse 2")
                     .get("/computers?p=2&n=10&s=name&d=asc")
             )
-            .pause(1)
+            .exitHereIfFailed()
+            .pause(2, 4)
             .exec(http("browse3")
                     .get("/computers?p=3&n=10&s=name&d=asc")
+            );
+
+    private final ScenarioBuilder add = scenario("add")
+            .exec(http("home")
+                    .get("/computers")
             )
-            .pause(1)
+            .exitHereIfFailed()
+            .pause(3, 7)
             .exec(http("add")
                     .get("/computers/new")
             )
-            .pause(1)
+            .exitHereIfFailed()
+            .pause(6, 10)
             .exec(http("post")
-                            .post("/computers")
-                            .formParam("name", "my macbook")
-                            .formParam("introduced", "2022-04-16")
-                            .formParam("discontinued", "2022-04-17")
-                            .formParam("company", "1")
-//                    .check(status().is(400))
+                    .post("/computers")
+                    .formParam("name", "my macbook")
+                    .formParam("introduced", "2022-04-16")
+                    .formParam("discontinued", "2022-04-17")
+                    .formParam("company", "1")
             );
 
     {
-        setUp(scn.injectOpen(atOnceUsers(1)))
-                .protocols(httpProtocol);
+        setUp(
+                search.injectClosed(
+                        rampConcurrentUsers(0).to(10).during(10),
+                        constantConcurrentUsers(10).during(30)
+                ),
+                browse.injectClosed(
+                        rampConcurrentUsers(0).to(10).during(10),
+                        constantConcurrentUsers(10).during(30)
+                ),
+                add.injectClosed(
+                        rampConcurrentUsers(0).to(2).during(10),
+                        constantConcurrentUsers(2).during(30)
+                )
+        ).protocols(httpProtocol);
     }
 }
