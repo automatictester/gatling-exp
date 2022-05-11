@@ -23,10 +23,9 @@ public class Steps {
     }
 
     public static ChainBuilder search() {
-        FeederBuilder.Batchable<String> feeder = csv("search.csv").random();
+        FeederBuilder<String> searchFeeder = csv("search.csv").random();
 
-        return exec()
-                .feed(feeder)
+        return feed(searchFeeder)
                 .exec(http("search")
                         .get("/computers?f=#{searchCriterion}"))
                 .exitHereIfFailed()
