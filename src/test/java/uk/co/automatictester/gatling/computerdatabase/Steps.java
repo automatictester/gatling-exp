@@ -18,7 +18,6 @@ public class Steps {
     public static ChainBuilder home() {
         return exec(http("home")
                 .get("/computers"))
-                .exitHereIfFailed()
                 .pause(3, 7);
     }
 
@@ -28,7 +27,6 @@ public class Steps {
         return feed(searchFeeder)
                 .exec(http("search")
                         .get("/computers?f=#{searchCriterion}"))
-                .exitHereIfFailed()
                 .pause(3, 7);
     }
 
@@ -44,14 +42,12 @@ public class Steps {
         return foreach(pageIds, "n").on(
                 exec(http("browse #{n}")
                         .get("/computers?p=#{n}&n=10&s=name&d=asc"))
-                        .exitHereIfFailed()
                         .pause(2, 4));
     }
 
     public static ChainBuilder add() {
         return exec(http("add")
                 .get("/computers/new"))
-                .exitHereIfFailed()
                 .pause(6, 10)
                 .exec(http("post")
                         .post("/computers")
@@ -60,7 +56,6 @@ public class Steps {
                         .formParam("discontinued", "2022-04-18")
                         .formParam("company", "1")
                 )
-                .exitHereIfFailed()
                 .pause(2, 4);
     }
 }

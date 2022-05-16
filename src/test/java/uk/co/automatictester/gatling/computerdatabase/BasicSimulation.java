@@ -13,22 +13,22 @@ public class BasicSimulation extends Simulation {
     private final HttpProtocolBuilder http = getHttpProtocol();
 
     private final ScenarioBuilder searchScn = scenario("search")
-            .exec(
+            .exitBlockOnFail(exec(
                     home(),
                     search()
-            );
+            ));
 
     private final ScenarioBuilder browseScn = scenario("browse")
-            .exec(
+            .exitBlockOnFail(exec(
                     home(),
                     browse(3)
-            );
+            ));
 
     private final ScenarioBuilder addScn = scenario("add")
-            .exec(
+            .exitBlockOnFail(exec(
                     home(),
                     add()
-            );
+            ));
 
     {
         setUp(
