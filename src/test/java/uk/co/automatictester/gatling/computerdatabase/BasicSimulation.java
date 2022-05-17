@@ -44,7 +44,8 @@ public class BasicSimulation extends Simulation {
                         rampConcurrentUsers(0).to(2).during(10),
                         constantConcurrentUsers(2).during(30)
                 )
-        ).protocols(http)
+        ).throttle(jumpToRps(20), holdFor(60))
+        .protocols(http)
                 .assertions(
                         global().successfulRequests().percent().is(100.0),
                         details("home").responseTime().percentile3().lte(2000),
